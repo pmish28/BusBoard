@@ -4,26 +4,38 @@ import readline from 'readline-sync';
 const api_key = process.env.API_KEY
 
 //let busStopCode = "490G00013535"// "490G00013535" 940GZZLUHWE// Remove this hardcoded value for testing
-let busStopCode = readline.prompt("Please enter bus stop code:");
 
-const fetchTflBuses = async (busStopCode) => {
-        const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
-        return(response.json());
+
+const getBusStopCode = async() => {
+    return "940GZZLUHWE";
+    // return readline.prompt("Please enter bus stop code:");
 }
-const busResponse = await fetchTflBuses(busStopCode);
-console.log(busResponse.length);
-if(busResponse.length > 0)
-{
-    for(let i =0;i<5;i++)
+const fetchTflBuses = async (busStopCode) => {
+    const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
+    return(response.json());
+}
+
+const parseResponse = async(busStopResponse) =>{
+    if(busStopResponse.length > 0)
         {
-            console.log(busResponse[i]["destinationName"] +" " 
-                +busResponse[i]["vehicleId"]+" " 
-                +busResponse[i]["lineName"]+" "
-                +busResponse[i]["timeToStation"]    
-            ); 
+            typeof(busStopResponse)
+            Array(busStopResponse).Sort((a,b)=>a.timeToStation-b.timeToStation);
+            for(let i =0;i<5;i++)
+                {
+                    console.log(busStopResponse[i]["destinationName"] +" " 
+                        +busStopResponse[i]["vehicleId"]+" " 
+                        +busStopResponse[i]["lineName"]+" "
+                        +busStopResponse[i]["timeToStation"]    
+                    ); 
+                }        
+        }
+        else
+        {
+                console.log("No data present");
         }        
 }
-else
-{
-        console.log("No data present");
-}
+
+
+const busStopCode = await getBusStopCode();
+const busStopResponse = await fetchTflBuses(busStopCode);
+await parseResponse(busStopResponse);
