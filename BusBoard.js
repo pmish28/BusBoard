@@ -5,19 +5,38 @@ const api_key = process.env.API_KEY
 
 //let busStopCode = "490G00013535"// "940GZZLUHWE" // Remove this hardcoded value for testing
 const getBusStopCode = async() => {
-    
-    return readline.prompt("Please enter bus stop code:");
+    let input;
+    const regExPostalCode = "([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})";
+    while(true)
+    {
+        input = readline.question("Please enter a post code:");
+        if(input.match(regExPostalCode))
+        {
+            console.log("Valid");
+            break;
+        }
+        else
+        {
+            throw Error("Invalid PostCode");
+        }
+    }    
 }
 
-const fetchTflBuses = async (busStopCode) => {
-    
-    const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
+const getAPIResponse = async(path)=>{
+    const response = await fetch(path);
     if(response.status !== 200) {
         throw Error(`Status code ${response.status} received.`);
-    }
-          
+    }          
     return(response.json());
-}
+};
+
+const fetchTflBuses = async (busStopCode) => {
+    return getAPIResponse(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
+};
+
+const getCoordinates = async(postCode) =>{
+    // return getAPIResponse(`https://api.postcodes.io/postcodes/${postCode}`);
+};
 
 const parseResponse = async(busStopResponse) =>{
     if(busStopResponse.length > 0)
@@ -43,8 +62,9 @@ const logging = async(busInformation) =>{
 }
 
 const busBoardingInfo = async() =>{
-    const busStopCode = await getBusStopCode();
-    const busStopResponse = await fetchTflBuses(busStopCode);
+    const postCode = await getBusStopCode();
+    const busStopResponse = await fetchTflBuses("940GZZLUHWE");// remove hardcoded value
+    const coordinates = await getCoordinates(postCode);// remove hardcoded value
     const busInformation = await parseResponse(busStopResponse);
     await logging(busInformation)
     }
