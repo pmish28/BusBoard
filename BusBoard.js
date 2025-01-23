@@ -5,10 +5,17 @@ const api_key = process.env.API_KEY
 
 //let busStopCode = "490G00013535"// "940GZZLUHWE" // Remove this hardcoded value for testing
 const getBusStopCode = async() => {
+    
     return readline.prompt("Please enter bus stop code:");
 }
+
 const fetchTflBuses = async (busStopCode) => {
+    
     const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
+    if(response.status !== 200) {
+        throw Error(`Status code ${response.status} received.`);
+    }
+          
     return(response.json());
 }
 
@@ -27,7 +34,7 @@ const parseResponse = async(busStopResponse) =>{
     }
     else
     {
-            return "No data present";
+         return "No data present";
     }        
 }
 
