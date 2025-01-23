@@ -14,25 +14,35 @@ const fetchTflBuses = async (busStopCode) => {
 
 const parseResponse = async(busStopResponse) =>{
     if(busStopResponse.length > 0)
+    {
+        busStopResponse.sort((a,b)=>a.timeToStation-b.timeToStation);
+        let busInformation = [];
+        for(let i =0;i<5;i++)
         {
-            //console.log(typeof busStopResponse);
-                busStopResponse.sort((a,b)=>a.timeToStation-b.timeToStation);
-            for(let i =0;i<5;i++)
-                {
-                    console.log(busStopResponse[i]["destinationName"] +" " 
-                        +busStopResponse[i]["vehicleId"]+" " 
-                        +busStopResponse[i]["lineName"]+" "
-                        +busStopResponse[i]["timeToStation"]    
-                    ); 
-                }        
-        }
-        else
-        {
-                console.log("No data present");
-        }        
+            busInformation.push(
+                busStopResponse[i]["destinationName"] +" " +busStopResponse[i]["vehicleId"]+" " 
+                +busStopResponse[i]["lineName"]+" " +busStopResponse[i]["timeToStation"]);
+        } 
+        return busInformation.join('\n');       
+    }
+    else
+    {
+            return "No data present";
+    }        
 }
 
+const logging = async(busInformation) =>{
+    console.log(busInformation);
+}
 
-const busStopCode = await getBusStopCode();
-const busStopResponse = await fetchTflBuses(busStopCode);
-await parseResponse(busStopResponse);
+const busBoardingInfo = async() =>{
+    const busStopCode = await getBusStopCode();
+    const busStopResponse = await fetchTflBuses(busStopCode);
+    const busInformation = await parseResponse(busStopResponse);
+    await logging(busInformation)
+    }
+
+
+busBoardingInfo();
+
+
