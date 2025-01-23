@@ -3,12 +3,12 @@ import readline from 'readline-sync';
 
 const api_key = process.env.API_KEY
 
-//let busStopCode = "490G00013535"// "490G00013535" 940GZZLUHWE// Remove this hardcoded value for testing
+//let busStopCode = "490G00013535"// "940GZZLUHWE" // Remove this hardcoded value for testing
 
 
 const getBusStopCode = async() => {
     return "940GZZLUHWE";
-    // return readline.prompt("Please enter bus stop code:");
+    //return readline.prompt("Please enter bus stop code:");
 }
 const fetchTflBuses = async (busStopCode) => {
     const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
@@ -18,8 +18,8 @@ const fetchTflBuses = async (busStopCode) => {
 const parseResponse = async(busStopResponse) =>{
     if(busStopResponse.length > 0)
         {
-            typeof(busStopResponse)
-            Array(busStopResponse).Sort((a,b)=>a.timeToStation-b.timeToStation);
+            //console.log(typeof busStopResponse);
+                busStopResponse.sort((a,b)=>a.timeToStation-b.timeToStation);
             for(let i =0;i<5;i++)
                 {
                     console.log(busStopResponse[i]["destinationName"] +" " 
