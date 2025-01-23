@@ -4,11 +4,8 @@ import readline from 'readline-sync';
 const api_key = process.env.API_KEY
 
 //let busStopCode = "490G00013535"// "940GZZLUHWE" // Remove this hardcoded value for testing
-
-
 const getBusStopCode = async() => {
-    return "940GZZLUHWE";
-    //return readline.prompt("Please enter bus stop code:");
+    return readline.prompt("Please enter bus stop code:");
 }
 const fetchTflBuses = async (busStopCode) => {
     const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
