@@ -4,7 +4,7 @@ import readline from 'readline-sync';
 const api_key = process.env.API_KEY
 
 //let busStopCode = "490G00013535"// "940GZZLUHWE" // Remove this hardcoded value for testing
-const getBusStopCode = async() => {
+const getPostCode = async() => {
     let input;
     const regExPostalCode = "([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})";
     while(true)
@@ -62,14 +62,11 @@ const logging = async(busInformation) =>{
 }
 
 const busBoardingInfo = async() =>{
-    const postCode = await getBusStopCode();
+    const postCode = await getPostCode();
     const busStopResponse = await fetchTflBuses("940GZZLUHWE");// remove hardcoded value
     const coordinates = await getCoordinates(postCode);// remove hardcoded value
     const busInformation = await parseResponse(busStopResponse);
     await logging(busInformation)
     }
 
-
 busBoardingInfo();
-
-
