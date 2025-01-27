@@ -43,18 +43,14 @@ const getCoordinates = async(postCode) =>{
 const getStopPointLists = async(coordinates) =>{
     const stopTypes = "NaptanPublicBusCoachTram";
     const radius = 200;
-    const busStopResponse = getAPIResponse(`https://api.tfl.gov.uk/StopPoint/?lat=${coordinates[0]}&lon=${coordinates[1]}&stopTypes=${stopTypes}&radius=${radius}&modes=bus`);
-    busStopResponse.sort((a,b)=>a.distance-b.distance);
-    let busInformation = [];
-    1>0?console.log(""):console.log("");
-
-    for(let i =0;busInformation.length>=2?i<2:i<busInformation.length;i++)
+    const busStopResponse = await getAPIResponse(`https://api.tfl.gov.uk/StopPoint/?lat=${coordinates[0]}&lon=${coordinates[1]}&stopTypes=${stopTypes}&radius=${radius}&modes=bus`);
+    //busStopResponse.sort((a,b)=>a.distance-b.distance);
+    let stopCodeId = [];
+    for(let i =0;busStopResponse.length>=2?i<2:i<busStopResponse.length;i++)
     {
-        busInformation.push(
-            busStopResponse[i]["destinationName"] +" " +busStopResponse[i]["vehicleId"]+" " 
-            +busStopResponse[i]["lineName"]+" " + Math.round(busStopResponse[i]["timeToStation"]/60 )+ " minutes");
+        stopCodeId.push(busStopResponse[i]["id"])
     } 
-    return busInformation.join('\n');     
+    return stopCodeId.join('\n');     
 }
 
 const parseResponse = async(busStopResponse) =>{
@@ -84,17 +80,20 @@ const busBoardingInfo = async() =>{
     //const postCode = await getPostCode();
     // const busStopResponse = await fetchTflBuses("940GZZLUHWE");// remove hardcoded value
     const coordinates = await getCoordinates('nw51tl');// remove hardcoded value
-    let listOfBusStopPoints = await getStopPointLists(coordinates);
-   
+    console.log(coordinates);
+    let listOfBusStopPoints = await getStopPointLists(coordinates);   
+    console.log(listOfBusStopPoints);
+
     //list of busstop points 2 stop ids;
-    // let stopCodeIds = [];
-    // for (i = 0;i<listOfBusStopPoints.length; i++)
-    // {
-    //     stopCodeIds.push(await fetchTflBuses(listOfBusStopPoints(i)));
-    // }
+    let busStopInformation = [];
+    for (let i = 0;i<listOfBusStopPoints.length; i++)
+    {
+        busStopInformation.push(await fetchTflBuses(listOfBusStopPoints(i)));
+    }
+    console.log(busStopInformation);
     
-    // const busInformation = await parseResponse(listOfBusStopPoints);
-    // await logging(busInformation)
+    const busInformation = await parseResponse(listOfBusStopPoints);
+    await logging(busInformation)
     }
 
 busBoardingInfo();
