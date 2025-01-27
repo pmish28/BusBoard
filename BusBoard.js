@@ -46,11 +46,11 @@ const getStopPointLists = async(coordinates) =>{
     const busStopResponse = await getAPIResponse(`https://api.tfl.gov.uk/StopPoint/?lat=${coordinates[0]}&lon=${coordinates[1]}&stopTypes=${stopTypes}&radius=${radius}&modes=bus`);
     //busStopResponse.sort((a,b)=>a.distance-b.distance);
     let stopCodeId = [];
-    for(let i =0;busStopResponse.length>=2?i<2:i<busStopResponse.length;i++)
+    for(let i =0;busStopResponse["stopPoints"].length>=2?i<2:i<busStopResponse["stopPoints"].length;i++)
     {
-        stopCodeId.push(busStopResponse[i]["id"])
+        stopCodeId.push(busStopResponse["stopPoints"][i]["id"])
     } 
-    return stopCodeId.join('\n');     
+    return stopCodeId;     
 }
 
 const parseResponse = async(busStopResponse) =>{
@@ -58,11 +58,11 @@ const parseResponse = async(busStopResponse) =>{
     {
         busStopResponse.sort((a,b)=>a.timeToStation-b.timeToStation);
         let busInformation = [];
-        for(let i =0;i<5;i++)
+        for(let i =0;i<busStopResponse.length;i++)
         {
             busInformation.push(
-                busStopResponse[i]["destinationName"] +" " +busStopResponse[i]["vehicleId"]+" " 
-                +busStopResponse[i]["lineName"]+" " + Math.round(busStopResponse[i]["timeToStation"]/60 )+ " minutes");
+                busStopResponse[i][i]["destinationName"] +" " +busStopResponse[i][i]["vehicleId"]+" " 
+                +busStopResponse[i][i]["lineName"]+" " + Math.round(busStopResponse[i][i]["timeToStation"]/60 )+ " minutes");
         } 
         return busInformation.join('\n');       
     }
@@ -88,11 +88,11 @@ const busBoardingInfo = async() =>{
     let busStopInformation = [];
     for (let i = 0;i<listOfBusStopPoints.length; i++)
     {
-        busStopInformation.push(await fetchTflBuses(listOfBusStopPoints(i)));
+        busStopInformation.push(await fetchTflBuses(listOfBusStopPoints[i]));
     }
     console.log(busStopInformation);
     
-    const busInformation = await parseResponse(listOfBusStopPoints);
+    const busInformation = await parseResponse(busStopInformation);
     await logging(busInformation)
     }
 
