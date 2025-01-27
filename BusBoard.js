@@ -35,8 +35,27 @@ const fetchTflBuses = async (busStopCode) => {
 };
 
 const getCoordinates = async(postCode) =>{
-    // return getAPIResponse(`https://api.postcodes.io/postcodes/${postCode}`);
+    const response = await getAPIResponse(`https://api.postcodes.io/postcodes/${postCode}`);
+    return [response["result"]["latitude"], response["result"]["longitude"]];
+
 };
+
+const getStopPointLists = async(coordinates) =>{
+    const stopTypes = "NaptanPublicBusCoachTram";
+    const radius = 200;
+    const busStopResponse = getAPIResponse(`https://api.tfl.gov.uk/StopPoint/?lat=${coordinates[0]}&lon=${coordinates[1]}&stopTypes=${stopTypes}&radius=${radius}&modes=bus`);
+    busStopResponse.sort((a,b)=>a.distance-b.distance);
+    let busInformation = [];
+    1>0?console.log(""):console.log("");
+
+    for(let i =0;busInformation.length>=2?i<2:i<busInformation.length;i++)
+    {
+        busInformation.push(
+            busStopResponse[i]["destinationName"] +" " +busStopResponse[i]["vehicleId"]+" " 
+            +busStopResponse[i]["lineName"]+" " + Math.round(busStopResponse[i]["timeToStation"]/60 )+ " minutes");
+    } 
+    return busInformation.join('\n');     
+}
 
 const parseResponse = async(busStopResponse) =>{
     if(busStopResponse.length > 0)
@@ -47,7 +66,7 @@ const parseResponse = async(busStopResponse) =>{
         {
             busInformation.push(
                 busStopResponse[i]["destinationName"] +" " +busStopResponse[i]["vehicleId"]+" " 
-                +busStopResponse[i]["lineName"]+" " +busStopResponse[i]["timeToStation"]);
+                +busStopResponse[i]["lineName"]+" " + Math.round(busStopResponse[i]["timeToStation"]/60 )+ " minutes");
         } 
         return busInformation.join('\n');       
     }
@@ -62,11 +81,20 @@ const logging = async(busInformation) =>{
 }
 
 const busBoardingInfo = async() =>{
-    const postCode = await getPostCode();
-    const busStopResponse = await fetchTflBuses("940GZZLUHWE");// remove hardcoded value
-    const coordinates = await getCoordinates(postCode);// remove hardcoded value
-    const busInformation = await parseResponse(busStopResponse);
-    await logging(busInformation)
+    //const postCode = await getPostCode();
+    // const busStopResponse = await fetchTflBuses("940GZZLUHWE");// remove hardcoded value
+    const coordinates = await getCoordinates('nw51tl');// remove hardcoded value
+    let listOfBusStopPoints = await getStopPointLists(coordinates);
+   
+    //list of busstop points 2 stop ids;
+    // let stopCodeIds = [];
+    // for (i = 0;i<listOfBusStopPoints.length; i++)
+    // {
+    //     stopCodeIds.push(await fetchTflBuses(listOfBusStopPoints(i)));
+    // }
+    
+    // const busInformation = await parseResponse(listOfBusStopPoints);
+    // await logging(busInformation)
     }
 
 busBoardingInfo();
